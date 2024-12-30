@@ -5,6 +5,7 @@ const AddFamily = () => {
   const [numberOfMembers, setNumberOfMembers] = useState("");
   const [locationId, setLocationId] = useState("");
   const [locations, setLocations] = useState([]);
+  const [members, setMembers] = useState([]);
   const [message, setMessage] = useState("");
 
   // Fetch locations on load
@@ -14,6 +15,25 @@ const AddFamily = () => {
       .then((data) => setLocations(data.locations))
       .catch((error) => console.error("Error fetching locations:", error));
   }, []);
+
+  // Handle changes in the number of members
+  const handleMemberCountChange = (count) => {
+    setNumberOfMembers(count);
+    const updatedMembers = Array.from({ length: count }, (_, i) => ({
+      id: i,
+      name: "",
+      age: "",
+      phoneNumber: "",
+    }));
+    setMembers(updatedMembers);
+  };
+
+  // Handle member details input
+  const handleMemberChange = (index, field, value) => {
+    const updatedMembers = [...members];
+    updatedMembers[index][field] = value;
+    setMembers(updatedMembers);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,22 +47,24 @@ const AddFamily = () => {
           familyName,
           numberOfMembers,
           locationId,
+          members,
         }),
       });
 
       if (response.ok) {
         const data = await response.json();
-        setMessage("Family added successfully!");
+        setMessage("Family and members added successfully!");
         setFamilyName("");
         setNumberOfMembers("");
         setLocationId("");
+        setMembers([]);
       } else {
         const errorData = await response.json();
-        setMessage(errorData.message || "Failed to add family.");
+        setMessage(errorData.message || "Failed to add family and members.");
       }
     } catch (error) {
-      console.error("Error adding family:", error);
-      setMessage("Error adding family.");
+      console.error("Error adding family and members:", error);
+      setMessage("Error adding family and members.");
     }
   };
 
@@ -62,7 +84,7 @@ const AddFamily = () => {
         <input
           type="number"
           value={numberOfMembers}
-          onChange={(e) => setNumberOfMembers(e.target.value)}
+          onChange={(e) => handleMemberCountChange(Number(e.target.value))}
           required
         />
 
@@ -80,7 +102,35 @@ const AddFamily = () => {
           ))}
         </select>
 
-        <button type="submit">Add Family</button>
+        <h2>Members</h2>
+        {members.map((member, index) => (
+          <div key={index}>
+            <h3>Member {index + 1}</h3>
+            <label>Name:</label>
+            <input
+              type="text"
+              value={member.name}
+              onChange={(e) => handleMemberChange(index, "name", e.target.value)}
+              required
+            />
+            <label>Age:</label>
+            <input
+              type="number"
+              value={member.age}
+              onChange={(e) => handleMemberChange(index, "age", e.target.value)}
+              required
+            />
+            <label>Phone Number:</label>
+            <input
+              type="text"
+              value={member.phoneNumber}
+              onChange={(e) => handleMemberChange(index, "phoneNumber", e.target.value)}
+              required
+            />
+          </div>
+        ))}
+
+        <button type="submit">Add Family and Members</button>
       </form>
 
       <p>{message}</p>
