@@ -1,61 +1,110 @@
-import React, { useState } from 'react';
-import '../styles.css';  // Importing the global CSS file
+import React, { useState, useEffect } from "react";
 
 const AddDonation = () => {
-  const [resourceId, setResourceId] = useState('');
-  const [quantity, setQuantity] = useState('');
-  const [date, setDate] = useState('');
+  const [resources, setResources] = useState([]);
+  const [selectedResource, setSelectedResource] = useState("");
+  const [donorName, setDonorName] = useState("");
+  const [donorContact, setDonorContact] = useState("");
+  const [quantity, setQuantity] = useState("");
+  const [message, setMessage] = useState("");
 
-  const handleAddDonation = async (e) => {
+  useEffect(() => {
+    const fetchResources = async () => {
+      try {
+        const response = await fetch("http://localhost:5500/api/resources");
+        const data = await response.json();
+        setResources(data);
+      } catch (error) {
+        console.error("Error fetching resources:", error);
+      }
+    };
+    fetchResources();
+  }, []);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setMessage("");
 
-    const response = await fetch('http://localhost:5500/api/donations', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ resourceId, quantity, date })
-    });
+    if (!selectedResource || !quantity) {
+      setMessage("Resource and quantity are required.");
+      return;
+    }
 
-    const data = await response.json();
-    if (response.ok) {
-      alert('Donation added successfully!');
-    } else {
-      alert(data.message);
+    try {
+      const response = await fetch("http://localhost:5500/api/admin/add-donation/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          donor_name: donorName,
+          donor_contact: donorContact,
+          resource_id: selectedResource,
+          quantity,
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setMessage(data.message);
+        setDonorName("");
+        setDonorContact("");
+        setSelectedResource("");
+        setQuantity("");
+      } else {
+        setMessage(data.message || "Failed to add donation.");
+      }
+    } catch (error) {
+      console.error("Error adding donation:", error);
+      setMessage("Error adding donation.");
     }
   };
 
   return (
-    <div className="add-donation-container">
+    <div>
       <h1>Add Donation</h1>
-      <form onSubmit={handleAddDonation}>
-        <label>
-          Resource ID:
-          <input
-            type="text"
-            value={resourceId}
-            onChange={(e) => setResourceId(e.target.value)}
-            required
-          />
-        </label>
-        <label>
-          Quantity:
-          <input
-            type="number"
-            value={quantity}
-            onChange={(e) => setQuantity(e.target.value)}
-            required
-          />
-        </label>
-        <label>
-          Date:
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            required
-          />
-        </label>
+      <form onSubmit={handleSubmit}>
+        <label>Donor Name (optional):</label>
+        <input
+          type="text"
+          value={donorName}
+          onChange={(e) => setDonorName(e.target.value)}
+        />
+        <br />
+
+        <label>Donor Contact (optional):</label>
+        <input
+          type="text"
+          value={donorContact}
+          onChange={(e) => setDonorContact(e.target.value)}
+        />
+        <br />
+
+        <label>Resource:</label>
+        <select
+          value={selectedResource}
+          onChange={(e) => setSelectedResource(e.target.value)}
+          required
+        >
+          <option value="">Select Resource</option>
+          {resources.map((resource) => (
+            <option key={resource.id} value={resource.id}>
+              {resource.name}
+            </option>
+          ))}
+        </select>
+        <br />
+
+        <label>Quantity:</label>
+        <input
+          type="number"
+          value={quantity}
+          onChange={(e) => setQuantity(e.target.value)}
+          required
+        />
+        <br />
+
         <button type="submit">Add Donation</button>
       </form>
+      <p>{message}</p>
     </div>
   );
 };

@@ -26,6 +26,8 @@ const AddLocation = () => {
       if (response.ok) {
         const data = await response.json();
         setMessage("Location added successfully!");
+        setAddress("");
+        setName("");
       } else {
         const errorData = await response.json();
         setMessage(errorData.message || "Failed to add location.");

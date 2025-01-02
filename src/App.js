@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Login from "./components/Login";
 import AddFamily from "./components/AddFamily";
+import AddRequest from "./components/AddRequest";
 
 import AddResource from "./components/AddResource";
 import AddDonation from "./components/AddDonation";
@@ -18,6 +19,7 @@ import ViewUsers from "./components/ViewUsers";
 
 import './styles.css'; // Importing the global CSS file
 
+
 const App = () => {
   return (
     <Router>
@@ -32,8 +34,11 @@ const App = () => {
         <Route path="/user-dashboard" element={<UserDashboard />} />
 
         {/* Admin Routes */}
+
         <Route path="/add-family" element={<AddFamily />} />
-      
+
+        <Route path="/add-request" element={<AddRequest />} />
+
         <Route path="/add-resource" element={<AddResource />} />
         <Route path="/add-donation" element={<AddDonation />} />
         <Route path="/add-user" element={<AddUser />} />

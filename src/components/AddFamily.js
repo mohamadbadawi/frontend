@@ -79,6 +79,7 @@ const AddFamily = () => {
           onChange={(e) => setFamilyName(e.target.value)}
           required
         />
+        <br></br>
 
         <label>Number of Members:</label>
         <input
@@ -87,6 +88,7 @@ const AddFamily = () => {
           onChange={(e) => handleMemberCountChange(Number(e.target.value))}
           required
         />
+        <br></br>
 
         <label>Location:</label>
         <select
@@ -97,7 +99,7 @@ const AddFamily = () => {
           <option value="">Select Location</option>
           {locations.map((location) => (
             <option key={location.id} value={location.id}>
-              {location.name}
+              {location.name},{location.address}
             </option>
           ))}
         </select>
@@ -113,6 +115,7 @@ const AddFamily = () => {
               onChange={(e) => handleMemberChange(index, "name", e.target.value)}
               required
             />
+   
             <label>Age:</label>
             <input
               type="number"
@@ -120,6 +123,7 @@ const AddFamily = () => {
               onChange={(e) => handleMemberChange(index, "age", e.target.value)}
               required
             />
+           
             <label>Phone Number:</label>
             <input
               type="text"
